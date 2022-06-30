@@ -1,14 +1,20 @@
 import { User } from "@app/user/decorators/user.decorator";
 import { AuthGuard } from "@app/user/guards/auth.guard";
 import { UserEntity } from "@app/user/user.entity";
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { ArticleService } from "./article.service";
 import { CreateArticleDto } from "./dto/createArticle.dto";
 import { ArticleResponseInterface } from "./types/articleResponse.interface";
+import { ArticlesResponseInterface } from "./types/articlesResponse.interface";
 
 @Controller('articles')
 export class ArticleController {
     constructor(private readonly articleService: ArticleService) {}
+
+    @Get()
+    async findAll(@User('id') currentUserId: number, @Query() query: any): Promise<ArticlesResponseInterface> {
+        return await this.articleService.findAll(currentUserId, query);
+    }
 
     @Post()
     @UseGuards(AuthGuard)

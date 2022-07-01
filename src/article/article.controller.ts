@@ -1,19 +1,30 @@
 import { User } from "@app/user/decorators/user.decorator";
 import { AuthGuard } from "@app/user/guards/auth.guard";
 import { UserEntity } from "@app/user/user.entity";
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, DefaultValuePipe, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { ArticleService } from "./article.service";
 import { CreateArticleDto } from "./dto/createArticle.dto";
 import { ArticleResponseInterface } from "./types/articleResponse.interface";
 import { ArticlesResponseInterface } from "./types/articlesResponse.interface";
+import { Pagination } from "nestjs-typeorm-paginate";
+import { ArticleEntity } from "./article.entity";
 
 @Controller('articles')
 export class ArticleController {
     constructor(private readonly articleService: ArticleService) {}
 
     @Get()
-    async findAll(@User('id') currentUserId: number, @Query() query: any): Promise<ArticlesResponseInterface> {
-        return await this.articleService.findAll(currentUserId, query);
+    async index(
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+        @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+    ): Promise<Pagination<ArticleEntity>> {
+        limit = limit > 100 ? 100 : limit;
+        return this.articleService.paginate({page, limit});
+    }
+
+    @Get('/filter')
+    async findByFilter(@Query() query: any): Promise<ArticlesResponseInterface> {
+       return await this.articleService.findByFilter(query);
     }
 
     @Post()

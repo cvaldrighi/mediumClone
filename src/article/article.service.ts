@@ -7,15 +7,27 @@ import { CreateArticleDto } from "./dto/createArticle.dto";
 import { ArticleResponseInterface } from "./types/articleResponse.interface";
 import slugify from "slugify";
 import { ArticlesResponseInterface } from "./types/articlesResponse.interface";
+import { paginate, Pagination, IPaginationOptions } from "nestjs-typeorm-paginate";
 
 @Injectable()
 export class ArticleService{
     constructor(@InjectRepository(ArticleEntity) private readonly articleRepository: Repository<ArticleEntity>,
                 @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>) {}
 
-    async findAll(currentUserId: number, query: any): Promise<ArticlesResponseInterface> {
-        const queryBuilder = this.articleRepository
+    
+    async paginate(options: IPaginationOptions): Promise<Pagination<ArticleEntity>> {
+        const queryBuilder= this.articleRepository
                             .createQueryBuilder('articles')
+                            .leftJoinAndSelect('articles.author', 'author');
+
+        queryBuilder.orderBy('articles.createdAt', 'DESC');
+
+        return paginate<ArticleEntity>(queryBuilder, options);
+    }
+
+    async findByFilter(query: any): Promise<ArticlesResponseInterface> {
+        const queryBuilder = this.articleRepository
+                            .createQueryBuilder('articles')                          
                             .leftJoinAndSelect('articles.author', 'author');
 
         if(query.tag) {
@@ -36,17 +48,7 @@ export class ArticleService{
         }
 
         queryBuilder.orderBy('articles.createdAt', 'DESC');
-
         const articlesCount = await queryBuilder.getCount();
-
-        if(query.limit){
-            queryBuilder.limit(query.limit);
-        }
-
-        if(query.offset){
-            queryBuilder.offset(query.offset);
-        }
-
         const articles = await queryBuilder.getMany();
 
         return {articles, articlesCount};

@@ -20,7 +20,8 @@
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d ./src/database/datasource.ts",
     "db:drop": "npm typeorm schema:drop",
     "db:create": "npm typeorm migration:generate -- -n",
-    "db:run": "npm typeorm migration:run"
+    "db:run": "npm typeorm migration:run",
+    "db:seed": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d ./src/database/ormseedconfig.ts migration:run"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",

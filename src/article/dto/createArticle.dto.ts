@@ -12,4 +12,6 @@ export class CreateArticleDto {
 
     readonly tagList?: string[];
 
+    readonly image: string;
+
 }

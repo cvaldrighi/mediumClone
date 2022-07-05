@@ -18,6 +18,9 @@ export class ArticleEntity {
     @Column({ default: '' })
     body: string;
 
+    @Column({ default: '' })
+    image: string;
+
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
 
@@ -27,7 +30,7 @@ export class ArticleEntity {
     @Column('simple-array')
     tagList: string[];
 
-    @Column({ default: 0})
+    @Column({ default: 0 })
     favoritesCount: number;
 
     @BeforeUpdate()
@@ -35,6 +38,6 @@ export class ArticleEntity {
         this.updatedAt = new Date();
     }
 
-    @ManyToOne(() => UserEntity, (user) => user.articles, {eager: true})
+    @ManyToOne(() => UserEntity, (user) => user.articles, { eager: true })
     author: UserEntity;
 }

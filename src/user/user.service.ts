@@ -15,7 +15,7 @@ export class UserService {
     constructor(
         @InjectRepository(UserEntity)
         private readonly userRepository: Repository<UserEntity>
-    ){}
+    ) { }
 
     async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
         const errorResponse = {
@@ -25,7 +25,7 @@ export class UserService {
         const userByEmail = await this.userRepository.findOne({
             where: {
                 email: createUserDto.email,
-            }          
+            }
         });
         const userByUsername = await this.userRepository.findOne({
             where: {
@@ -33,17 +33,17 @@ export class UserService {
             }
         });
 
-        if(userByEmail){
+        if (userByEmail) {
             errorResponse.errors['email'] = 'has already been taken'
         }
 
-        if(userByUsername){
+        if (userByUsername) {
             errorResponse.errors['username'] = 'has already been taken'
         }
-        
-        if(userByEmail || userByUsername) {
+
+        if (userByEmail || userByUsername) {
             throw new HttpException(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
-        } 
+        }
 
         const newUser = new UserEntity();
         Object.assign(newUser, createUserDto);
@@ -54,7 +54,7 @@ export class UserService {
 
     async findById(id: number): Promise<UserEntity> {
         return this.userRepository.findOne({
-            where: {id}
+            where: { id }
         });
     }
 
@@ -68,18 +68,18 @@ export class UserService {
         const user = await this.userRepository.findOne({
             where: {
                 email: loginUserDto.email
-            }, 
+            },
             select: ['id', 'username', 'email', 'bio', 'image', 'password'],
 
         });
 
-        if(!user) {
+        if (!user) {
             throw new HttpException(errorReponse, HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
         const isPasswordCorrect = await compare(loginUserDto.password, user.password);
 
-        if(!isPasswordCorrect) {
+        if (!isPasswordCorrect) {
             throw new HttpException(errorReponse, HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
@@ -107,6 +107,7 @@ export class UserService {
             user: {
                 ...user,
                 token: this.generateJwt(user)
+
             }
         }
     }

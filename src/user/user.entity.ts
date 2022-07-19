@@ -1,6 +1,5 @@
 import { BeforeInsert, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { hash } from 'bcrypt';
-import { hasUncaughtExceptionCaptureCallback } from "process";
 import { ArticleEntity } from "@app/article/article.entity";
 
 @Entity({ name: 'users'})
